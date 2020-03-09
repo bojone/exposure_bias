@@ -82,11 +82,21 @@ model = build_transformer_model(
 
 model.summary()
 
+def sparse_categorical_crossentropy(y_true, y_pred):
+    """自定义稀疏交叉熵
+    这主要是因为keras自带的sparse_categorical_crossentropy不支持求二阶梯度。
+    """
+    y_true = K.reshape(y_true, K.shape(y_pred)[:-1])
+    y_true = K.cast(y_true, 'int32')
+    y_true = K.one_hot(y_true, K.shape(y_pred)[-1])
+    return K.categorical_crossentropy(y_true, y_pred)
+
+
 # 交叉熵作为loss，并mask掉输入部分的预测
 y_true = model.input[0][:, 1:]  # 目标tokens
 y_mask = model.input[1][:, 1:]
 y_pred = model.output[:, :-1]  # 预测tokens，预测与目标错开一位
-cross_entropy = K.sparse_categorical_crossentropy(y_true, y_pred)
+cross_entropy = sparse_categorical_crossentropy(y_true, y_pred)
 cross_entropy = K.sum(cross_entropy * y_mask) / K.sum(y_mask)
 embeddings = search_layer(model.output, 'Embedding-Token').embeddings
 gp = K.sum(K.gradients(cross_entropy, [embeddings])[0].values**2)
