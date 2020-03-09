@@ -82,6 +82,7 @@ model = build_transformer_model(
 
 model.summary()
 
+
 def sparse_categorical_crossentropy(y_true, y_pred):
     """自定义稀疏交叉熵
     这主要是因为keras自带的sparse_categorical_crossentropy不支持求二阶梯度。
