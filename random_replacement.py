@@ -138,7 +138,7 @@ class Evaluate(keras.callbacks.Callback):
         metrics = self.evaluate(valid_data)  # 评测模型
         if metrics['bleu'] > self.best_bleu:
             self.best_bleu = metrics['bleu']
-            model.save_weights('./best_model.weights')  # 保存模型
+            model.save_weights('./best_model.replace.weights')  # 保存模型
         metrics['best_bleu'] = self.best_bleu
         print('valid_data:', metrics)
 
@@ -181,4 +181,4 @@ if __name__ == '__main__':
 
 else:
 
-    model.load_weights('./best_model.weights')
+    model.load_weights('./best_model.replace.weights')
